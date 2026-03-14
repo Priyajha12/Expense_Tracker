@@ -7,7 +7,7 @@ import { fetchDashboardData } from '../services/dashboardService';
 import {
     Filter, ArrowUpDown, ChevronUp, ChevronDown, Plus,
     TrendingUp, Zap, Calendar, DollarSign, Target, Activity,
-    Layers, ShoppingBag, ArrowRight, ShieldCheck
+    Layers, ShoppingBag, ArrowRight, Shield
 } from 'lucide-react';
 
 import { createIncome, fetchIncomeCategories } from '../services/incomeService';
@@ -118,9 +118,30 @@ const Dashboard = () => {
         return items;
     }, [data?.breakdown, sortConfig]);
 
+    const topCategories = React.useMemo(() => {
+        if (!data?.breakdown) return [];
+        return data.breakdown
+            .filter(c => !excludeFixedTop3 || c.is_fixed === 0)
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 3);
+    }, [data?.breakdown, excludeFixedTop3]);
+
     if (loading && !data) return (
         <div className="flex items-center justify-center min-h-[60vh]">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+        </div>
+    );
+
+    if (!data) return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-400">
+            <Activity size={48} className="mb-4 opacity-20" />
+            <p className="font-black uppercase tracking-widest text-xs">Failed to load dashboard</p>
+            <button
+                onClick={loadData}
+                className="mt-4 px-6 py-2 bg-slate-100 text-slate-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-colors"
+            >
+                Retry Connection
+            </button>
         </div>
     );
 
@@ -129,27 +150,30 @@ const Dashboard = () => {
     const leftAmount = Math.max(0, totalIncome - totalSpent);
     const avgDaily = totalSpent / getDaysInMonth(new Date(year, month - 1));
 
-    const fixedTotal = data?.breakdown?.filter(c => c.is_fixed === 1).reduce((sum, c) => sum + c.total, 0) || 0;
-    const variableTotal = data?.breakdown?.filter(c => c.is_fixed === 0).reduce((sum, c) => sum + c.total, 0) || 0;
+    const fixedTotal = (data?.breakdown || []).filter(c => c.is_fixed === 1).reduce((sum, c) => sum + c.total, 0) || 0;
+    const variableTotal = (data?.breakdown || []).filter(c => c.is_fixed === 0).reduce((sum, c) => sum + c.total, 0) || 0;
 
     const donutData = [
         { name: 'Variable', value: variableTotal, color: '#F59E0B' },
         { name: 'Fixed', value: fixedTotal, color: '#10B981' }
     ];
 
-    const barChartData = data?.dailyTrend?.map(day => ({
-        ...day,
-        dateFormatted: format(parseISO(day.date), 'MMM dd'),
-        displayValue: excludeFixed ? day.variableAmount : day.total
-    })) || [];
+    const barChartData = (data?.dailyTrend || []).map(day => {
+        let dateLabel = 'N/A';
+        try {
+            if (day.date) dateLabel = format(parseISO(day.date), 'MMM dd');
+        } catch (e) {
+            console.error("Date formatting error", e);
+        }
 
-    const topCategories = React.useMemo(() => {
-        if (!data?.breakdown) return [];
-        return data.breakdown
-            .filter(c => !excludeFixedTop3 || c.is_fixed === 0)
-            .sort((a, b) => b.total - a.total)
-            .slice(0, 3);
-    }, [data?.breakdown, excludeFixedTop3]);
+        return {
+            ...day,
+            dateFormatted: dateLabel,
+            displayValue: excludeFixed ? (day.variableAmount || 0) : (day.total || 0)
+        };
+    });
+
+
 
     return (
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -390,7 +414,7 @@ const Dashboard = () => {
 
                             <div className="pt-4 border-t border-white/10 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <ShieldCheck size={16} className="text-emerald-400" />
+                                    <Shield size={16} className="text-emerald-400" />
                                     <span className="text-xs font-bold text-slate-400">Spending within limits</span>
                                 </div>
                                 <span className="text-[10px] font-black uppercase tracking-widest text-amber-500 underline cursor-pointer">Deep Dive</span>
@@ -457,7 +481,7 @@ const Dashboard = () => {
                                             <span className="text-xs font-black text-slate-900">₹{cat.total.toLocaleString()}</span>
                                         </div>
                                         <div className="w-full h-1 bg-slate-50 rounded-full overflow-hidden">
-                                            <div className="h-full bg-amber-500 rounded-full" style={{ width: `${(cat.total / totalSpent) * 100}%` }}></div>
+                                            <div className="h-full bg-amber-500 rounded-full" style={{ width: `${totalSpent > 0 ? (cat.total / totalSpent) * 100 : 0}%` }}></div>
                                         </div>
                                     </div>
                                 </div>
