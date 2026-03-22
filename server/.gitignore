@@ -1,2 +1,7 @@
 node_modules
-database.sqlite
+*.sqlite*
+.env
+.DS_Store
+server.log
+token.txt
+package-lock.json
