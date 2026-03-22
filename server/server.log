@@ -1,0 +1,60 @@
+[dotenv@17.2.3] injecting env (3) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+Initializing Auth Routes
+Registering Routes...
+Connected to SQLite database at ./expense_tracker.sqlite
+Database schema initialized.
+Migration: Created category_budgets table
+Server running on port 5003
+[2026-03-22T09:56:51.204Z] GET /api/health
+[2026-03-22T09:57:10.434Z] OPTIONS /api/auth/me
+[2026-03-22T09:57:10.436Z] OPTIONS /api/auth/me
+[2026-03-22T09:57:10.444Z] GET /api/auth/me
+[2026-03-22T09:57:10.450Z] GET /api/auth/me
+[2026-03-22T09:57:10.471Z] OPTIONS /api/dashboard?month=3&year=2026
+[2026-03-22T09:57:10.472Z] OPTIONS /api/incomes/categories
+[2026-03-22T09:57:10.473Z] OPTIONS /api/incomes/categories
+[2026-03-22T09:57:10.474Z] OPTIONS /api/dashboard?month=3&year=2026
+[2026-03-22T09:57:10.474Z] GET /api/dashboard?month=3&year=2026
+[2026-03-22T09:57:10.475Z] GET /api/incomes/categories
+[2026-03-22T09:57:10.480Z] GET /api/incomes/categories
+[Dashboard Debug] User: 6, Month: 03, Year: 2026, Methods: 4
+[Dashboard Debug] First Method: Cash, Total: 7223
+[2026-03-22T09:57:10.495Z] GET /api/dashboard?month=3&year=2026
+[Dashboard Debug] User: 6, Month: 03, Year: 2026, Methods: 4
+[Dashboard Debug] First Method: Cash, Total: 7223
+[2026-03-22T09:58:38.221Z] OPTIONS /api/auth/me
+[2026-03-22T09:58:38.223Z] OPTIONS /api/auth/me
+[2026-03-22T09:58:38.224Z] GET /api/auth/me
+[2026-03-22T09:58:38.227Z] GET /api/auth/me
+[2026-03-22T09:58:38.284Z] OPTIONS /api/dashboard?month=3&year=2026
+[2026-03-22T09:58:38.291Z] OPTIONS /api/incomes/categories
+[2026-03-22T09:58:38.291Z] OPTIONS /api/dashboard?month=3&year=2026
+[2026-03-22T09:58:38.291Z] OPTIONS /api/incomes/categories
+[2026-03-22T09:58:38.292Z] GET /api/dashboard?month=3&year=2026
+[2026-03-22T09:58:38.292Z] GET /api/incomes/categories
+[2026-03-22T09:58:38.295Z] GET /api/incomes/categories
+[Dashboard Debug] User: 6, Month: 03, Year: 2026, Methods: 4
+[Dashboard Debug] First Method: Cash, Total: 7223
+[2026-03-22T09:58:38.298Z] GET /api/dashboard?month=3&year=2026
+[Dashboard Debug] User: 6, Month: 03, Year: 2026, Methods: 4
+[Dashboard Debug] First Method: Cash, Total: 7223
+[2026-03-22T09:59:19.809Z] OPTIONS /api/payment-methods/18
+[2026-03-22T09:59:19.810Z] PUT /api/payment-methods/18
+[2026-03-22T09:59:19.830Z] OPTIONS /api/dashboard?month=3&year=2026
+[2026-03-22T09:59:19.832Z] GET /api/dashboard?month=3&year=2026
+[Dashboard Debug] User: 6, Month: 03, Year: 2026, Methods: 4
+[Dashboard Debug] First Method: Cash, Total: 7223
+[2026-03-22T09:59:27.456Z] OPTIONS /api/payment-methods/21
+[2026-03-22T09:59:27.457Z] PUT /api/payment-methods/21
+[2026-03-22T09:59:27.462Z] OPTIONS /api/dashboard?month=3&year=2026
+[2026-03-22T09:59:27.463Z] GET /api/dashboard?month=3&year=2026
+[Dashboard Debug] User: 6, Month: 03, Year: 2026, Methods: 4
+[Dashboard Debug] First Method: Cash, Total: 7223
+[2026-03-22T09:59:39.577Z] OPTIONS /api/expenses?month=3&year=2026
+[2026-03-22T09:59:39.582Z] GET /api/expenses?month=3&year=2026
+[2026-03-22T09:59:39.591Z] OPTIONS /api/categories
+[2026-03-22T09:59:39.592Z] OPTIONS /api/expenses?month=3&year=2026
+[2026-03-22T09:59:39.592Z] OPTIONS /api/categories
+[2026-03-22T09:59:39.593Z] GET /api/categories
+[2026-03-22T09:59:39.595Z] GET /api/expenses?month=3&year=2026
+[2026-03-22T09:59:39.597Z] GET /api/categories

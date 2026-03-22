@@ -7,8 +7,9 @@ import { fetchDashboardData } from '../services/dashboardService';
 import {
     Filter, ArrowUpDown, ChevronUp, ChevronDown, Plus,
     TrendingUp, Zap, Calendar, DollarSign, Target, Activity,
-    Layers, ShoppingBag, ArrowRight, Shield
+    Layers, ShoppingBag, ArrowRight, Shield, CreditCard, PieChart as PieChartIcon, Edit2
 } from 'lucide-react';
+import { updatePaymentMethod } from '../services/paymentMethodService';
 
 import { createIncome, fetchIncomeCategories } from '../services/incomeService';
 import { format, parseISO, getDaysInMonth } from 'date-fns';
@@ -36,6 +37,10 @@ const Dashboard = () => {
         date: format(new Date(), 'yyyy-MM-dd'),
         note: ''
     });
+
+    // Payment Method Limit Edit State
+    const [editingPm, setEditingPm] = useState(null);
+    const [pmLimit, setPmLimit] = useState('');
 
     const COLORS = ['#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#F43F5E', '#06B6D4', '#6366F1'];
 
@@ -86,6 +91,17 @@ const Dashboard = () => {
             loadData();
         } catch (err) {
             alert('Failed to add income');
+        }
+    };
+
+    const handleLimitUpdate = async (e) => {
+        e.preventDefault();
+        try {
+            await updatePaymentMethod(editingPm.id, { credit_limit: Number(pmLimit) });
+            setEditingPm(null);
+            loadData();
+        } catch (err) {
+            alert('Failed to update limit');
         }
     };
 
@@ -223,57 +239,57 @@ const Dashboard = () => {
             </div>
 
             {/* 1. Monthly Overview Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
                 {/* Total Expenses */}
-                <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
-                    <div className="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center mb-4 border border-amber-100">
-                        <DollarSign size={24} />
+                <div className="bg-white p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-50 text-amber-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-4 border border-amber-100">
+                        <DollarSign size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
-                        <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest leading-none mb-2">Total Expenses</p>
-                        <h3 className="text-3xl font-black text-slate-900 leading-none tracking-tight">₹{totalSpent.toLocaleString()}</h3>
+                        <p className="text-slate-400 font-bold text-[8px] md:text-[10px] uppercase tracking-widest leading-none mb-1 md:mb-2">Total Expenses</p>
+                        <h3 className="text-xl md:text-3xl font-black text-slate-900 leading-none tracking-tight">₹{totalSpent.toLocaleString()}</h3>
                     </div>
                 </div>
 
                 {/* Savings (How much left) */}
-                <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
-                    <div className="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center mb-4 border border-emerald-100">
-                        <Zap size={24} />
+                <div className="bg-white p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-50 text-emerald-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-4 border border-emerald-100">
+                        <Zap size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
-                        <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest leading-none mb-2">Savings</p>
-                        <h3 className="text-3xl font-black text-slate-900 leading-none tracking-tight">₹{leftAmount.toLocaleString()}</h3>
+                        <p className="text-slate-400 font-bold text-[8px] md:text-[10px] uppercase tracking-widest leading-none mb-1 md:mb-2">Savings</p>
+                        <h3 className="text-xl md:text-3xl font-black text-slate-900 leading-none tracking-tight">₹{leftAmount.toLocaleString()}</h3>
                     </div>
                 </div>
 
                 {/* Avg Daily Spend */}
-                <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
-                    <div className="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center mb-4 border border-indigo-100">
-                        <TrendingUp size={24} />
+                <div className="bg-white p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 text-indigo-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-4 border border-indigo-100">
+                        <TrendingUp size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
-                        <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest leading-none mb-2">Avg. Daily Spend</p>
-                        <h3 className="text-3xl font-black text-slate-900 leading-none tracking-tight">₹{Math.round(avgDaily).toLocaleString()}</h3>
+                        <p className="text-slate-400 font-bold text-[8px] md:text-[10px] uppercase tracking-widest leading-none mb-1 md:mb-2">Avg. Daily Spend</p>
+                        <h3 className="text-xl md:text-3xl font-black text-slate-900 leading-none tracking-tight">₹{Math.round(avgDaily).toLocaleString()}</h3>
                     </div>
                 </div>
 
                 {/* Transactions */}
-                <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
-                    <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-4 border border-blue-100">
-                        <Activity size={24} />
+                <div className="bg-white p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col justify-between">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-50 text-blue-500 rounded-xl md:rounded-2xl flex items-center justify-center mb-3 md:mb-4 border border-blue-100">
+                        <Activity size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
-                        <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest leading-none mb-2">Transactions</p>
-                        <h3 className="text-3xl font-black text-slate-900 leading-none tracking-tight">{data?.transactionCount || 0}</h3>
+                        <p className="text-slate-400 font-bold text-[8px] md:text-[10px] uppercase tracking-widest leading-none mb-1 md:mb-2">Transactions</p>
+                        <h3 className="text-xl md:text-3xl font-black text-slate-900 leading-none tracking-tight">{data?.transactionCount || 0}</h3>
                     </div>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
                 {/* 2. Spending by Category */}
-                <div className="lg:col-span-1 bg-white rounded-[3rem] p-8 border border-slate-100 shadow-sm flex flex-col">
-                    <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Category Split</h3>
+                <div className="lg:col-span-1 bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-slate-100 shadow-sm flex flex-col">
+                    <div className="flex items-center justify-between mb-6 md:mb-8">
+                        <h3 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">Category Split</h3>
                         <Layers size={20} className="text-slate-300" />
                     </div>
 
@@ -319,10 +335,10 @@ const Dashboard = () => {
                 </div>
 
                 {/* 3. Daily Spending Trend */}
-                <div className="lg:col-span-2 bg-white rounded-[3rem] p-8 border border-slate-100 shadow-sm">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
+                <div className="lg:col-span-2 bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-slate-100 shadow-sm">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-10">
                         <div className="flex items-center gap-3">
-                            <h3 className="text-xl font-black text-slate-900 tracking-tight">Daily Spending Trend</h3>
+                            <h3 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">Daily Spending Trend</h3>
                             <button
                                 onClick={() => setExcludeFixed(!excludeFixed)}
                                 className={`text-[9px] font-black uppercase px-3 py-1 rounded-full transition-all border ${excludeFixed ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
@@ -330,10 +346,10 @@ const Dashboard = () => {
                                 {excludeFixed ? 'Excluding Fixed' : 'Including Fixed'}
                             </button>
                         </div>
-                        <Calendar size={20} className="text-slate-300" />
+                        <Calendar size={20} className="text-slate-300 hidden sm:block" />
                     </div>
 
-                    <div className="h-[350px] w-full">
+                    <div className="h-[250px] md:h-[350px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={barChartData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -364,29 +380,149 @@ const Dashboard = () => {
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="mt-8 p-4 bg-slate-50 rounded-2xl flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-amber-500">
-                                <TrendingUp size={20} />
+                    <div className="mt-8 p-3 md:p-4 bg-slate-50 rounded-2xl flex items-center justify-between">
+                        <div className="flex items-center gap-3 md:gap-4 font-black">
+                            <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-amber-500">
+                                <TrendingUp size={16} className="md:w-5 md:h-5" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Peak Spending Day</p>
-                                <p className="text-sm font-black text-slate-800">
+                                <p className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-tighter">Peak Spending Day</p>
+                                <p className="text-xs md:text-sm font-black text-slate-800">
                                     {data?.peakDay?.date ? format(parseISO(data.peakDay.date), 'MMMM do') : 'N/A'}
                                 </p>
                             </div>
                         </div>
                         <div className="text-right">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Amount</p>
-                            <p className="text-sm font-black text-amber-500">₹{data?.peakDay?.total?.toLocaleString() || 0}</p>
+                            <p className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-tighter">Amount</p>
+                            <p className="text-xs md:text-sm font-black text-amber-500">₹{data?.peakDay?.total?.toLocaleString() || 0}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                {/* 1. Payment Method Split Pie Chart */}
+                <div className="bg-white rounded-[2.5rem] p-6 md:p-8 border border-slate-100 shadow-sm flex flex-col min-h-[400px]">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center">
+                                <PieChartIcon size={20} />
+                            </div>
+                            <h3 className="text-xl font-black text-slate-900 tracking-tight">Payment Split</h3>
+                        </div>
+                        <span className="text-[10px] font-black uppercase text-slate-400">By usage volume</span>
+                    </div>
+
+                    <div className="flex-1 min-h-[250px] relative">
+                        {data?.paymentSplit && data.paymentSplit.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={data.paymentSplit}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={85}
+                                        paddingAngle={5}
+                                        dataKey="total"
+                                        nameKey="name"
+                                    >
+                                        {data.paymentSplit.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                        formatter={(v) => [`₹${(Number(v) || 0).toLocaleString()}`, 'Usage']}
+                                    />
+                                    <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center text-slate-300">
+                                <Activity size={40} className="mb-2 opacity-20" />
+                                <p className="text-[10px] uppercase font-black tracking-widest">No spending data</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* 2. Credit Wall (Limits and Tracking) */}
+                <div className="bg-white rounded-[2.5rem] p-6 md:p-8 border border-slate-100 shadow-sm flex flex-col min-h-[400px]">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center">
+                                <CreditCard size={20} />
+                            </div>
+                            <h3 className="text-xl font-black text-slate-900 tracking-tight">Credit & Wallet Wall</h3>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 space-y-4 overflow-y-auto custom-scrollbar pr-2">
+                        {data?.paymentSplit && data.paymentSplit.length > 0 ? (
+                            data.paymentSplit.map((pm) => {
+                                const limit = Number(pm.credit_limit || 0);
+                                const total = Number(pm.total || 0);
+                                const hasLimit = limit > 0;
+                                const utilization = hasLimit ? Math.min(100, (total / limit) * 100) : 0;
+                                const isCritical = utilization > 80;
+
+                                return (
+                                    <div key={pm.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-all group">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div>
+                                                <h4 className="font-black text-slate-800 text-sm md:text-base">{pm.name}</h4>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                    Spent: <span className="text-slate-900">₹{total.toLocaleString()}</span>
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => { setEditingPm(pm); setPmLimit(pm.credit_limit || ''); }}
+                                                className="p-1.5 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-amber-500 hover:bg-white rounded-lg transition-all shadow-sm"
+                                            >
+                                                <Edit2 size={14} />
+                                            </button>
+                                        </div>
+
+                                        {hasLimit ? (
+                                            <div>
+                                                <div className="flex justify-between items-center mb-1.5 px-0.5">
+                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${isCritical ? 'text-red-500' : 'text-slate-400'}`}>
+                                                        {Math.round(utilization)}% Utilized
+                                                    </span>
+                                                    <span className="text-[10px] font-black text-slate-900">₹{limit.toLocaleString()} Limit</span>
+                                                </div>
+                                                <div className="w-full h-2 bg-slate-200/50 rounded-full overflow-hidden">
+                                                    <div
+                                                        className={`h-full rounded-full transition-all duration-1000 ${isCritical ? 'bg-red-500' : 'bg-emerald-500'}`}
+                                                        style={{ width: `${utilization}%` }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => { setEditingPm(pm); setPmLimit(''); }}
+                                                className="w-full py-2.5 border border-dashed border-slate-300 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-amber-500 hover:border-amber-400 hover:bg-white transition-all bg-white/50"
+                                            >
+                                                + Assign Credit Limit
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center text-slate-300 pb-12">
+                                <Shield size={40} className="mb-2 opacity-20" />
+                                <p className="text-[10px] uppercase font-black tracking-widest">Initialization required</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 {/* 4. Insights & Highlights */}
-                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden h-full">
+                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2rem] md:rounded-[3rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden h-full">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
 
                     <div className="relative z-10">
@@ -425,17 +561,17 @@ const Dashboard = () => {
 
                 {/* Additional Analytics: Top 3 & Distribution */}
                 <div className="grid grid-cols-1 gap-6">
-                    <div className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm flex items-center justify-between">
-                        <div className="flex items-center gap-5">
-                            <div className="w-14 h-14 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center border border-amber-100 shadow-sm shadow-amber-500/10">
-                                <Target size={28} />
+                    <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-6 border border-slate-100 shadow-sm flex items-center justify-between">
+                        <div className="flex items-center gap-3 md:gap-5">
+                            <div className="w-10 h-10 md:w-14 md:h-14 bg-amber-50 text-amber-500 rounded-xl md:rounded-2xl flex items-center justify-center border border-amber-100 shadow-sm shadow-amber-500/10">
+                                <Target size={20} className="md:w-7 md:h-7" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Variable vs Fixed</p>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-lg font-black text-slate-900">₹{variableTotal.toLocaleString()}</span>
+                                <p className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Variable vs Fixed</p>
+                                <div className="flex items-center gap-2 md:gap-3">
+                                    <span className="text-sm md:text-lg font-black text-slate-900">₹{variableTotal.toLocaleString()}</span>
                                     <span className="text-slate-200">/</span>
-                                    <span className="text-lg font-black text-slate-400">₹{fixedTotal.toLocaleString()}</span>
+                                    <span className="text-sm md:text-lg font-black text-slate-400">₹{fixedTotal.toLocaleString()}</span>
                                 </div>
                             </div>
                         </div>
@@ -458,18 +594,18 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm h-full flex flex-col justify-center">
+                    <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border border-slate-100 shadow-sm h-full flex flex-col justify-center">
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                             <div className="flex items-center gap-3">
-                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Top 3 Burners</h4>
+                                <h4 className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Top 3 Burners</h4>
                                 <button
                                     onClick={() => setExcludeFixedTop3(!excludeFixedTop3)}
-                                    className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full transition-all border ${excludeFixedTop3 ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
+                                    className={`text-[7px] md:text-[8px] font-black uppercase px-2 py-0.5 rounded-full transition-all border ${excludeFixedTop3 ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
                                 >
                                     {excludeFixedTop3 ? 'Excluding Fixed' : 'Including Fixed'}
                                 </button>
                             </div>
-                            <ShoppingBag size={16} className="text-slate-300" />
+                            <ShoppingBag size={16} className="text-slate-300 hidden sm:block" />
                         </div>
                         <div className="space-y-4">
                             {topCategories.map((cat, i) => (
@@ -490,6 +626,35 @@ const Dashboard = () => {
                     </div>
                 </div>
             </div>
+
+            <Modal
+                isOpen={!!editingPm}
+                onClose={() => setEditingPm(null)}
+                title={`Manage ${editingPm?.name} Limit`}
+            >
+                <form onSubmit={handleLimitUpdate} className="space-y-6 pt-4">
+                    <div>
+                        <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Monthly Credit/Limit Amount</label>
+                        <div className="relative">
+                            <span className="absolute left-4 top-3.5 text-slate-400 font-black">₹</span>
+                            <input
+                                type="number"
+                                value={pmLimit}
+                                onChange={e => setPmLimit(e.target.value)}
+                                className="w-full pl-10 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-amber-500 transition-all font-black text-slate-900 text-xl"
+                                placeholder="e.g. 50000"
+                            />
+                        </div>
+                        <p className="text-[10px] text-slate-400 mt-2 font-bold px-1 italic">
+                            Set this to track your monthly usage against a specific limit (e.g. for Credit Cards or a fixed Cash budget).
+                        </p>
+                    </div>
+                    <div className="flex gap-4 justify-end pt-4">
+                        <button type="button" onClick={() => setEditingPm(null)} className="px-6 py-2 text-slate-400 font-black uppercase text-xs tracking-widest">Cancel</button>
+                        <button type="submit" className="px-10 py-3 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-slate-900/10">Save Limit</button>
+                    </div>
+                </form>
+            </Modal>
 
             <Modal
                 isOpen={isIncomeModalOpen}

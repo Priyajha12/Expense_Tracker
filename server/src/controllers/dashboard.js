@@ -73,6 +73,22 @@ const getDashboardData = async (req, res) => {
         // 5. Peak Day Insight
         const peakDay = dailyTrend.reduce((max, day) => (day.total > (max.total || 0) ? day : max), {});
 
+        // 6. Payment Method Split
+        console.log(`[Dashboard] Fetching split for UID: ${req.user.id}, Date: ${yearStr}-${monthStr}`);
+        const paymentSplit = await db.all(
+            `SELECT 
+                pm.id, pm.name, pm.credit_limit,
+                COALESCE(SUM(e.amount), 0) as total
+             FROM payment_methods pm
+             LEFT JOIN expenses e ON e.payment_method_id = pm.id
+                AND strftime('%m', e.date) = ? 
+                AND strftime('%Y', e.date) = ?
+             WHERE pm.user_id = ?
+             GROUP BY pm.id, pm.name, pm.credit_limit`,
+            [monthStr, yearStr, req.user.id]
+        );
+        console.log(`[Dashboard] Found ${paymentSplit.length} methods`);
+
         res.json({
             success: true,
             data: {
@@ -82,6 +98,7 @@ const getDashboardData = async (req, res) => {
                 transactionCount,
                 dailyTrend,
                 breakdown: breakdown.sort((a, b) => b.total - a.total),
+                paymentSplit,
                 peakDay,
                 period: { month: currentMonth, year: currentYear }
             }

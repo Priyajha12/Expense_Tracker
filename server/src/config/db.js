@@ -63,6 +63,31 @@ async function connectDB() {
             console.log('Migration: Added credit limit and due date to payment_methods');
         } catch (err) { }
 
+        // Migration: Add description to categories
+        try {
+            await db.run('ALTER TABLE categories ADD COLUMN description TEXT');
+            console.log('Migration: Added description column to categories');
+
+            // Populating descriptions for existing default categories
+            const descriptions = {
+                'Food': 'For dining out and coffee runs',
+                'Groceries': 'Home essentials and kitchen supplies',
+                'Transport': 'Fuel, cabs, and public transit',
+                'Shopping': 'Clothes, electronics, and personal buys',
+                'Rent': 'Monthly housing costs',
+                'Bills': 'Electricity, water, internet, and phone',
+                'Entertainment': 'Movies, subscriptions, and outings',
+                'Investments': 'Stocks, mutual funds, and savings',
+                'Health': 'Medicines, gym, and doctor visits',
+                'Travel': 'Flights, hotels, and vacation spending'
+            };
+
+            for (const [name, desc] of Object.entries(descriptions)) {
+                await db.run('UPDATE categories SET description = ? WHERE name = ? AND (description IS NULL OR description = "")', [desc, name]);
+            }
+            console.log('Migration: Seeded descriptions for existing categories');
+        } catch (err) { }
+
         // Migration: Create category_budgets table
         try {
             await db.run(`

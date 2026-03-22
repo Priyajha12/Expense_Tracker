@@ -32,28 +32,29 @@ const register = async (req, res) => {
 
         // Seed Default Categories
         const defaultCats = [
-            { name: 'Food', color: '#f87171' },
-            { name: 'Groceries', color: '#fbbf24' },
-            { name: 'Transport', color: '#60a5fa' },
-            { name: 'Shopping', color: '#f472b6' },
-            { name: 'Rent', color: '#818cf8' },
-            { name: 'Bills', color: '#fb923c' },
-            { name: 'Entertainment', color: '#a78bfa' },
-            { name: 'Health', color: '#34d399' },
-            { name: 'Travel', color: '#2dd4bf' }
+            { name: 'Food', color: '#f87171', description: 'For dining out and coffee runs' },
+            { name: 'Groceries', color: '#fbbf24', description: 'Home essentials and kitchen supplies' },
+            { name: 'Transport', color: '#60a5fa', description: 'Fuel, cabs, and public transit' },
+            { name: 'Shopping', color: '#f472b6', description: 'Clothes, electronics, and personal buys' },
+            { name: 'Rent', color: '#818cf8', description: 'Monthly housing costs' },
+            { name: 'Bills', color: '#fb923c', description: 'Electricity, water, internet, and phone' },
+            { name: 'Entertainment', color: '#a78bfa', description: 'Movies, subscriptions, and outings' },
+            { name: 'Investments', color: '#10b981', description: 'Stocks, mutual funds, and savings' },
+            { name: 'Health', color: '#34d399', description: 'Medicines, gym, and doctor visits' },
+            { name: 'Travel', color: '#2dd4bf', description: 'Flights, hotels, and vacation spending' }
         ];
         for (const cat of defaultCats) {
             await db.run(
-                'INSERT INTO categories (user_id, name, color) VALUES (?, ?, ?)',
-                [newUser.id, cat.name, cat.color]
+                'INSERT INTO categories (user_id, name, color, description) VALUES (?, ?, ?, ?)',
+                [newUser.id, cat.name, cat.color, cat.description]
             );
         }
 
         // Seed Default Payment Methods
         const defaultMethods = ['Cash', 'UPI', 'Debit Card', 'Credit Card'];
         for (const methodName of defaultMethods) {
-            // Set 'Cash' as default (is_default = 1), others 0
-            const isDefault = methodName === 'Cash' ? 1 : 0;
+            // Set 'UPI' as default (is_default = 1), others 0
+            const isDefault = methodName === 'UPI' ? 1 : 0;
             await db.run(
                 'INSERT INTO payment_methods (user_id, name, is_default) VALUES (?, ?, ?)',
                 [newUser.id, methodName, isDefault]
@@ -100,24 +101,37 @@ const login = async (req, res) => {
             return res.status(401).json({ success: false, error: 'Invalid credentials' });
         }
 
+        // Migration: Add budget to categories
+        try {
+            await db.run('ALTER TABLE categories ADD COLUMN budget REAL DEFAULT 0');
+            console.log('Migration: Added budget column to categories');
+        } catch (err) { /* column already exists */ }
+
+        // Migration: Add description to categories
+        try {
+            await db.run('ALTER TABLE categories ADD COLUMN description TEXT');
+            console.log('Migration: Added description column to categories');
+        } catch (err) { /* column already exists */ }
+
         // Check and seed categories if missing
         const catCount = await db.get('SELECT COUNT(*) as count FROM categories WHERE user_id = ?', user.id);
         if (catCount.count === 0) {
             const defaultCats = [
-                { name: 'Food', color: '#f87171' },
-                { name: 'Groceries', color: '#fbbf24' },
-                { name: 'Transport', color: '#60a5fa' },
-                { name: 'Shopping', color: '#f472b6' },
-                { name: 'Rent', color: '#818cf8' },
-                { name: 'Bills', color: '#fb923c' },
-                { name: 'Entertainment', color: '#a78bfa' },
-                { name: 'Health', color: '#34d399' },
-                { name: 'Travel', color: '#2dd4bf' }
+                { name: 'Food', color: '#f87171', description: 'For dining out and coffee runs' },
+                { name: 'Groceries', color: '#fbbf24', description: 'Home essentials and kitchen supplies' },
+                { name: 'Transport', color: '#60a5fa', description: 'Fuel, cabs, and public transit' },
+                { name: 'Shopping', color: '#f472b6', description: 'Clothes, electronics, and personal buys' },
+                { name: 'Rent', color: '#818cf8', description: 'Monthly housing costs' },
+                { name: 'Bills', color: '#fb923c', description: 'Electricity, water, internet, and phone' },
+                { name: 'Entertainment', color: '#a78bfa', description: 'Movies, subscriptions, and outings' },
+                { name: 'Investments', color: '#10b981', description: 'Stocks, mutual funds, and savings' }, // Added Investments
+                { name: 'Health', color: '#34d399', description: 'Medicines, gym, and doctor visits' },
+                { name: 'Travel', color: '#2dd4bf', description: 'Flights, hotels, and vacation spending' }
             ];
             for (const cat of defaultCats) {
                 await db.run(
-                    'INSERT INTO categories (user_id, name, color) VALUES (?, ?, ?)',
-                    [user.id, cat.name, cat.color]
+                    'INSERT INTO categories (user_id, name, color, description) VALUES (?, ?, ?, ?)',
+                    [user.id, cat.name, cat.color, cat.description]
                 );
             }
         }
@@ -127,7 +141,7 @@ const login = async (req, res) => {
         if (methodCount.count === 0) {
             const defaultMethods = ['Cash', 'UPI', 'Debit Card', 'Credit Card'];
             for (const methodName of defaultMethods) {
-                const isDefault = methodName === 'Cash' ? 1 : 0;
+                const isDefault = methodName === 'UPI' ? 1 : 0;
                 await db.run(
                     'INSERT INTO payment_methods (user_id, name, is_default) VALUES (?, ?, ?)',
                     [user.id, methodName, isDefault]

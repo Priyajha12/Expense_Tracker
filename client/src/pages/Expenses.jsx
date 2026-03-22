@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Calendar, FileText, TrendingDown, Layers, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Edit2, Trash2, Calendar, FileText, TrendingDown, Layers, ChevronDown, ChevronUp, CreditCard } from 'lucide-react';
 import { fetchExpenses, createExpense, createBulkExpenses, updateExpense, deleteExpense } from '../services/expenseService';
 import { fetchCategories, createCategory, updateCategory } from '../services/categoryService';
 import ExpenseForm from '../components/ExpenseForm';
@@ -137,6 +137,7 @@ const Expenses = () => {
                 id: cat.id,
                 name: cat.name,
                 color: cat.color || '#9ca3af',
+                description: cat.description,
                 total: 0,
                 budget: cat.budget || 0,
                 transactions: []
@@ -188,14 +189,14 @@ const Expenses = () => {
                         </select>
                     </div>
 
-                    <div className="w-px h-8 bg-slate-100 mx-1"></div>
+                    <div className="w-px h-8 bg-slate-100 mx-1 hidden sm:block"></div>
 
                     <button
-                        onClick={() => setIsCategoryModalOpen(true)}
-                        className="p-3 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition-all hover:scale-110 active:scale-95 shadow-lg shadow-slate-900/20"
-                        title="Add Category"
+                        onClick={() => setIsExpenseModalOpen(true)}
+                        className="px-4 md:px-6 py-3 bg-slate-900 text-white rounded-[1.5rem] hover:bg-slate-800 transition-all font-black text-[10px] md:text-xs uppercase tracking-widest shadow-lg shadow-slate-900/20 flex items-center gap-2 group whitespace-nowrap"
                     >
-                        <Plus size={20} strokeWidth={3} />
+                        <Plus size={16} strokeWidth={3} className="group-hover:rotate-90 transition-transform hidden md:block" />
+                        Record Expense
                     </button>
                 </div>
             </div>
@@ -237,40 +238,47 @@ const Expenses = () => {
                             return (
                                 <div key={cat.name} className={`bg-white rounded-[2rem] border transition-all duration-300 ${isExpanded ? 'border-amber-200 shadow-2xl shadow-amber-500/5 scale-[1.01]' : 'border-slate-100 shadow-sm hover:translate-x-1'}`}>
                                     {/* Parent Row */}
-                                    <div className="flex items-center justify-between p-5 cursor-pointer" onClick={() => toggleCategory(cat.name)}>
-                                        <div className="flex items-center gap-5 flex-1 select-none">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 cursor-pointer gap-4" onClick={() => toggleCategory(cat.name)}>
+                                        <div className="flex items-center gap-3 md:gap-5 flex-1 select-none">
                                             <div
-                                                className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg"
+                                                className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-black text-base md:text-lg shadow-lg flex-shrink-0"
                                                 style={{ backgroundColor: cat.color }}
                                             >
                                                 {cat.name.charAt(0).toUpperCase()}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-3 mb-1">
-                                                    <div className="flex items-center gap-2 max-w-full">
-                                                        <h3 className="font-black text-slate-800 text-lg tracking-tight truncate">{cat.name}</h3>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                // Find the actual category object from the list to get all details
-                                                                const fullCat = categories.find(c => c.id === cat.id);
-                                                                handleCategoryEditClick(fullCat);
-                                                            }}
-                                                            className="p-1 text-slate-300 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-all"
-                                                            title="Edit Category Settings"
-                                                        >
-                                                            <Edit2 size={12} />
-                                                        </button>
+                                                <div className="flex flex-col mb-1">
+                                                    <div className="flex flex-col mb-1.5">
+                                                        <div className="flex items-center gap-2">
+                                                            <h3 className="font-black text-slate-800 text-base md:text-lg tracking-tight truncate">{cat.name}</h3>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    // Find the actual category object from the list to get all details
+                                                                    const fullCat = categories.find(c => c.id === cat.id);
+                                                                    handleCategoryEditClick(fullCat);
+                                                                }}
+                                                                className="p-1 text-slate-300 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-all"
+                                                                title="Edit Category Settings"
+                                                            >
+                                                                <Edit2 size={12} />
+                                                            </button>
+                                                        </div>
+                                                        {cat.description && (
+                                                            <p className="text-[10px] md:text-xs text-slate-400 font-bold leading-tight italic truncate max-w-sm">
+                                                                {cat.description}
+                                                            </p>
+                                                        )}
                                                     </div>
                                                     {hasBudget && (
-                                                        <div className="flex items-center gap-2 flex-1 max-w-[120px]">
-                                                            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                                        <div className="flex items-center gap-2 w-full max-w-[120px]">
+                                                            <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
                                                                 <div
                                                                     className={`h-full rounded-full transition-all duration-1000 ${percent > 90 ? 'bg-red-500' : percent > 70 ? 'bg-orange-500' : 'bg-amber-500'}`}
                                                                     style={{ width: `${percent}%` }}
                                                                 ></div>
                                                             </div>
-                                                            <span className="text-[9px] font-black text-slate-400">{percent.toFixed(0)}%</span>
+                                                            <span className="text-[8px] md:text-[9px] font-black text-slate-400">{percent.toFixed(0)}%</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -290,9 +298,9 @@ const Expenses = () => {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-5 pl-4">
-                                            <div className="text-right">
-                                                <span className="font-black text-slate-900 text-xl block leading-none">₹{cat.total.toLocaleString()}</span>
+                                        <div className="flex items-center justify-between sm:justify-end gap-3 md:gap-5">
+                                            <div className="text-left sm:text-right">
+                                                <span className="font-black text-slate-900 text-lg md:text-xl block leading-none">₹{cat.total.toLocaleString()}</span>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <button
@@ -300,12 +308,12 @@ const Expenses = () => {
                                                         e.stopPropagation();
                                                         handleCategoryClick(cat.id);
                                                     }}
-                                                    className="w-10 h-10 flex items-center justify-center bg-amber-50 text-amber-600 rounded-2xl hover:bg-amber-100 hover:scale-110 active:scale-95 transition-all shadow-sm border border-amber-100"
+                                                    className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-amber-50 text-amber-600 rounded-xl md:rounded-2xl hover:bg-amber-100 transition-all shadow-sm border border-amber-100"
                                                 >
-                                                    <Plus size={20} strokeWidth={3} />
+                                                    <Plus size={18} strokeWidth={3} className="md:w-5 md:h-5" />
                                                 </button>
                                                 <div className={`text-slate-300 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-                                                    <ChevronDown size={24} />
+                                                    <ChevronDown size={20} className="md:w-6 md:h-6" />
                                                 </div>
                                             </div>
                                         </div>
@@ -317,26 +325,39 @@ const Expenses = () => {
                                             {cat.transactions.length > 0 ? (
                                                 <div className="space-y-2">
                                                     {cat.transactions.sort((a, b) => new Date(b.date) - new Date(a.date)).map((t) => (
-                                                        <div key={t.id} className="group flex items-center justify-between py-3 px-4 rounded-2xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
-                                                            <div className="flex items-center gap-5">
-                                                                <div className="w-14">
-                                                                    <div className="text-[10px] font-black text-slate-400 uppercase leading-none mb-1">
+                                                        <div key={t.id} className="group flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 rounded-2xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100 gap-3">
+                                                            <div className="flex items-center gap-4 md:gap-5 flex-1 min-w-0">
+                                                                <div className="w-10 md:w-14 flex-shrink-0">
+                                                                    <div className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase leading-none mb-1">
                                                                         {format(parseISO(t.date), 'MMM')}
                                                                     </div>
-                                                                    <div className="text-lg font-black text-slate-900 leading-none">
+                                                                    <div className="text-base md:text-lg font-black text-slate-900 leading-none">
                                                                         {format(parseISO(t.date), 'dd')}
                                                                     </div>
                                                                 </div>
-                                                                <div className="flex items-baseline gap-3">
-                                                                    <span className="text-base font-black text-slate-800">₹{t.amount.toLocaleString()}</span>
-                                                                    {t.note && (
-                                                                        <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5 line-clamp-1 border-l border-slate-100 pl-3">
-                                                                            {t.note}
-                                                                        </span>
+                                                                <div className="flex flex-col min-w-0">
+                                                                    <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                                                                        <span className="text-sm md:text-lg font-black text-slate-900 flex-shrink-0">₹{t.amount.toLocaleString()}</span>
+                                                                        {t.payment_method_name && (
+                                                                            <span className="text-[9px] font-black text-slate-500 uppercase bg-slate-100/80 px-2 py-0.5 rounded-lg border border-slate-200/50 flex items-center gap-1">
+                                                                                <CreditCard size={10} className="text-slate-400" />
+                                                                                {t.payment_method_name}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                    {t.note ? (
+                                                                        <div className="flex items-start gap-1.5 mt-1">
+                                                                            <FileText size={12} className="text-slate-300 mt-0.5" />
+                                                                            <p className="text-[10px] md:text-xs text-slate-500 font-bold leading-relaxed max-w-md">
+                                                                                {t.note}
+                                                                            </p>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <p className="text-[10px] text-slate-300 italic font-bold mt-1">No note provided</p>
                                                                     )}
                                                                 </div>
                                                             </div>
-                                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                                                            <div className="flex items-center justify-end gap-2 sm:opacity-0 group-hover:opacity-100 transition-all sm:translate-x-4 group-hover:translate-x-0 border-t sm:border-t-0 border-slate-50 pt-2 sm:pt-0">
                                                                 <button
                                                                     onClick={() => handleEditClick(t)}
                                                                     className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-md rounded-xl transition-all border border-transparent hover:border-blue-100"
@@ -369,6 +390,17 @@ const Expenses = () => {
                                 </div>
                             );
                         })}
+
+                        {/* Add Category Button Card */}
+                        <button
+                            onClick={() => setIsCategoryModalOpen(true)}
+                            className="w-full py-8 md:py-10 border-2 border-dashed border-slate-100 rounded-[2rem] text-slate-400 hover:text-amber-500 hover:border-amber-200 hover:bg-amber-50/30 transition-all flex flex-col items-center justify-center gap-3 group"
+                        >
+                            <div className="w-12 h-12 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300 group-hover:border-amber-200 group-hover:text-amber-500 transition-all">
+                                <Plus size={24} strokeWidth={3} />
+                            </div>
+                            <span className="font-black text-[10px] md:text-xs uppercase tracking-widest">Add New Category</span>
+                        </button>
                     </div>
                 </div>
             )}

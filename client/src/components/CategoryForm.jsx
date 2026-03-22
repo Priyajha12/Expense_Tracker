@@ -13,7 +13,8 @@ const CategoryForm = ({ initialData, onSubmit, onCancel }) => {
         is_fixed: false,
         fixed_amount: '',
         budget: '',
-        deducted_date: ''
+        deducted_date: '',
+        description: ''
     });
 
     useEffect(() => {
@@ -24,7 +25,8 @@ const CategoryForm = ({ initialData, onSubmit, onCancel }) => {
                 is_fixed: initialData.is_fixed === 1,
                 fixed_amount: initialData.fixed_amount || '',
                 budget: initialData.budget || '',
-                deducted_date: initialData.deducted_date || ''
+                deducted_date: initialData.deducted_date || '',
+                description: initialData.description || ''
             });
         }
     }, [initialData]);
@@ -46,9 +48,22 @@ const CategoryForm = ({ initialData, onSubmit, onCancel }) => {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-bold"
                     placeholder="e.g., Groceries"
                     required
+                />
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                </label>
+                <input
+                    type="text"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    placeholder="e.g. Home essentials and kitchen supplies"
                 />
             </div>
 

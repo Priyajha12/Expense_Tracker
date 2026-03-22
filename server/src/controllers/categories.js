@@ -14,7 +14,7 @@ const getCategories = async (req, res) => {
 };
 
 const createCategory = async (req, res) => {
-    const { name, color, is_fixed, fixed_amount, budget, deducted_date } = req.body;
+    const { name, color, is_fixed, fixed_amount, budget, deducted_date, description } = req.body;
     if (!name) {
         return res.status(400).json({ success: false, error: 'Name is required' });
     }
@@ -22,8 +22,8 @@ const createCategory = async (req, res) => {
     try {
         const db = getDB();
         const result = await db.run(
-            'INSERT INTO categories (user_id, name, color, is_fixed, fixed_amount, budget, deducted_date) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [req.user.id, name, color || '#000000', is_fixed ? 1 : 0, fixed_amount || 0, budget || 0, deducted_date]
+            'INSERT INTO categories (user_id, name, color, is_fixed, fixed_amount, budget, deducted_date, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [req.user.id, name, color || '#000000', is_fixed ? 1 : 0, fixed_amount || 0, budget || 0, deducted_date, description]
         );
 
         const newCategory = await db.get('SELECT * FROM categories WHERE id = ?', result.lastID);
@@ -36,7 +36,7 @@ const createCategory = async (req, res) => {
 
 const updateCategory = async (req, res) => {
     const { id } = req.params;
-    const { name, color, is_fixed, fixed_amount, budget, deducted_date } = req.body;
+    const { name, color, is_fixed, fixed_amount, budget, deducted_date, description } = req.body;
 
     try {
         const db = getDB();
@@ -46,7 +46,7 @@ const updateCategory = async (req, res) => {
         }
 
         await db.run(
-            'UPDATE categories SET name = ?, color = ?, is_fixed = ?, fixed_amount = ?, budget = ?, deducted_date = ? WHERE id = ?',
+            'UPDATE categories SET name = ?, color = ?, is_fixed = ?, fixed_amount = ?, budget = ?, deducted_date = ?, description = ? WHERE id = ?',
             [
                 name || category.name,
                 color || category.color,
@@ -54,6 +54,7 @@ const updateCategory = async (req, res) => {
                 fixed_amount !== undefined ? fixed_amount : category.fixed_amount,
                 budget !== undefined ? budget : category.budget,
                 deducted_date !== undefined ? deducted_date : category.deducted_date,
+                description !== undefined ? description : category.description,
                 id
             ]
         );

@@ -126,10 +126,10 @@ const ExpenseForm = ({ initialData, prefilledCategoryId, onSubmit, onCancel }) =
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                 {items.map((item, index) => (
-                    <div key={item.id} className="relative group bg-white p-4 rounded-2xl border border-slate-100 hover:border-amber-200 transition-all hover:shadow-lg hover:shadow-amber-500/5">
-                        <div className="flex flex-col xl:flex-row items-end gap-3">
-                            {/* Category - First Column */}
-                            <div className="w-full xl:w-[22%]">
+                    <div key={item.id} className="relative group bg-white p-4 md:p-5 rounded-2xl border border-slate-100 hover:border-amber-200 transition-all hover:shadow-lg hover:shadow-amber-500/5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end mb-4">
+                            {/* Category */}
+                            <div>
                                 <label className="block text-[10px] font-black text-slate-400 uppercase mb-1.5 tracking-widest pl-1">Category</label>
                                 <select
                                     value={item.category_id}
@@ -143,20 +143,8 @@ const ExpenseForm = ({ initialData, prefilledCategoryId, onSubmit, onCancel }) =
                                 </select>
                             </div>
 
-                            {/* Note - Optional */}
-                            <div className="w-full xl:flex-1">
-                                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1.5 tracking-widest pl-1">Note (Optional)</label>
-                                <input
-                                    type="text"
-                                    value={item.note}
-                                    onChange={(e) => handleItemChange(item.id, 'note', e.target.value)}
-                                    className="w-full px-4 py-2 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-bold text-slate-700 h-[42px]"
-                                    placeholder="Lunch, Grocery..."
-                                />
-                            </div>
-
                             {/* Amount */}
-                            <div className="w-full xl:w-[15%]">
+                            <div>
                                 <label className="block text-[10px] font-black text-slate-400 uppercase mb-1.5 tracking-widest pl-1">Amount</label>
                                 <div className="relative">
                                     <span className="absolute left-4 top-2.5 text-slate-400 font-black">₹</span>
@@ -173,7 +161,7 @@ const ExpenseForm = ({ initialData, prefilledCategoryId, onSubmit, onCancel }) =
                             </div>
 
                             {/* Date */}
-                            <div className="w-full xl:w-[18%]">
+                            <div>
                                 <label className="block text-[10px] font-black text-slate-400 uppercase mb-1.5 tracking-widest pl-1">Date</label>
                                 <input
                                     type="date"
@@ -185,29 +173,42 @@ const ExpenseForm = ({ initialData, prefilledCategoryId, onSubmit, onCancel }) =
                             </div>
 
                             {/* Payment Method */}
-                            <div className="w-full xl:w-[15%]">
-                                <label className="block text-[10px] font-black text-slate-400 uppercase mb-1.5 tracking-widest pl-1">Payment</label>
-                                <select
-                                    value={item.payment_method_id}
-                                    onChange={(e) => handleItemChange(item.id, 'payment_method_id', Number(e.target.value))}
-                                    className="w-full px-4 py-2 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-bold text-slate-700 h-[42px] appearance-none"
-                                    required
-                                >
-                                    {paymentMethods.map(pm => (
-                                        <option key={pm.id} value={pm.id}>{pm.name}</option>
-                                    ))}
-                                </select>
+                            <div className="flex items-end gap-2">
+                                <div className="flex-1">
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase mb-1.5 tracking-widest pl-1">Payment</label>
+                                    <select
+                                        value={item.payment_method_id}
+                                        onChange={(e) => handleItemChange(item.id, 'payment_method_id', Number(e.target.value))}
+                                        className="w-full px-4 py-2 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-bold text-slate-700 h-[42px] appearance-none"
+                                        required
+                                    >
+                                        {paymentMethods.map(pm => (
+                                            <option key={pm.id} value={pm.id}>{pm.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {!initialData && items.length > 1 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveItem(item.id)}
+                                        className="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all h-[42px]"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                )}
                             </div>
+                        </div>
 
-                            {!initialData && items.length > 1 && (
-                                <button
-                                    type="button"
-                                    onClick={() => handleRemoveItem(item.id)}
-                                    className="mb-0.5 p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-                            )}
+                        {/* Note - Moving below and making it full width */}
+                        <div className="w-full">
+                            <label className="block text-[10px] font-black text-slate-400 uppercase mb-1.5 tracking-widest pl-1">Note / Description (Optional)</label>
+                            <input
+                                type="text"
+                                value={item.note}
+                                onChange={(e) => handleItemChange(item.id, 'note', e.target.value)}
+                                className="w-full px-4 py-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-bold text-slate-700"
+                                placeholder="What was this for? (e.g. Starbucks with friends, Monthly Electricity...)"
+                            />
                         </div>
                     </div>
                 ))}

@@ -112,3 +112,10 @@ FinLady is built with privacy in mind. Your data is stored locally in an SQLite 
 ---
 
 Designed with ❤️ for better financial futures.
+
+📱 Design Philosophy: Mobile-First
+FinLady is designed to live in your pocket.
+
+Thumb-Zone Navigation: Primary actions are at the bottom for easy reach on large phones.
+Glassmorphism: A sleek, translucent UI that feels modern and lightweight.
+Zero Placeholders: We use real UI logic to ensure every interaction feels premium.
